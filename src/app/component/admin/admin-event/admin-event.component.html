@@ -1,0 +1,306 @@
+<div class="app-content content">
+  <div class="content-wrapper">
+    <div class="content-wrapper-before"></div>
+    <div class="content-header row">
+      <div class="content-header-left col-md-4 col-12 mb-2">
+        <h3 class="content-header-title">Manage Events</h3>
+      </div>
+      <div class="content-header-right col-md-8 col-12">
+        <div class="breadcrumbs-top float-md-right">
+          <div class="breadcrumb-wrapper mr-1">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="index.html">Home</a>
+              </li>
+              <li class="breadcrumb-item active">Event
+              </li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="uploadModal" tabindex="-1" role="dialog" aria-labelledby="uploadModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="uploadModalLabel">Upload Image</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <label class="image-upload-container btn btn-bwm">
+              <input #imageInput placeholder="Select an Image" type="file" accept="image/*" (change)="processFile($event)">
+            </label>
+          </div>
+          <div class="modal-footer">
+            <span class="btn btn-secondary" data-dismiss="modal">
+              Close
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="content-body">
+      <section id="content-types">
+        <div class="row match-height justify-content-md-center">
+          <div class="col-xl-6 col-md-12">
+            <div class="card">
+              <div class="card-content">
+                <div class="card-body">
+                  <h4 class="card-title">Event</h4>
+                  <h6 class="card-subtitle text-muted">Add Event</h6>
+                  <form class="form" [formGroup]="eventForm" (ngSubmit)=onSubmit(eventForm)>
+                    <input type="hidden" formControlName="_id">
+                    <input type="hidden" formControlName="image_name">
+                    <div class="form-group">
+                      <div class="row">
+                        <div class="col-12">
+                          Event Name
+                          <input type="text" class="form-control" placeholder="Event Name" formControlName="title">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <div class="row">
+                        <div class="col-6">
+                          Conducted By
+                          <select class="custom-select" formControlName="department_id">
+                            <option disabled value="">Department</option>
+                            <option *ngFor="let department of departments" value={{department._id}}>{{department.name}}</option>
+                          </select>
+                        </div>
+                        <div class="col-6">
+                          Event Category
+                          <select class="custom-select" placeholder="Category" formControlName="category_id" (change)="ChangeBoxes()">
+                            <option disabled value="">Category</option>
+                            <option *ngFor="let category of categories" value={{category._id}}>{{category.name}}</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <div class="row">
+                        <div class="col-12">
+                          Description
+                          <textarea class="form-control" placeholder="Describe the Event Here" formControlName="description"
+                            [ngClass]="{'is-invalid': submitted && f.title.errors}">
+                            </textarea>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <div class="row">
+                        <div class="col-12">
+                          Rules of The Event
+                          <textarea class="form-control" placeholder="Rules" formControlName="rules" [ngClass]="{'is-invalid': submitted && f.title.errors}">
+                        </textarea>
+                        <div class="form-control-feedback">
+                          Use $ symbol for nextLine.Dont use $ at the Last line
+                        </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group" *ngIf="workshop">
+                      <div class="row">
+                        <div class="col-12">
+                          Resourse Person
+                          <input type="text" class="form-control" placeholder="Details of Resourse person" formControlName="resourse_person">
+                        </div>
+                      </div>
+                    </div>
+                    <hr>
+                    <div class="form-group">
+                      <h4 class="card-title">Time Details</h4>
+                      <div class="row">
+                        <div class="col-4">
+                          Starting Time
+                          <input type="time" class="form-control" value="" placeholder="Start Time" formControlName="start_time">
+                        </div>
+                        <div class="col-4">
+                          Ending Time
+                          <input type="time" class="form-control" value="" placeholder="Ending Time" formControlName="end_time">
+                        </div>
+                        <div class="col-4">
+                          Event Date
+                          <input type="date" class="form-control" value="" placeholder="Event Date" formControlName="event_date">
+                        </div>
+                      </div>
+                    </div>
+                    <hr *ngIf="event">
+                    <div class="form-group" *ngIf="event">
+                      <h4 class="card-title">Round Details</h4>
+                      <div class="row">
+                        <div class="col-3">
+                          Prelims
+                          <input type="time" class="form-control" placeholder="Prelims" formControlName="prelims">
+                        </div>
+                        <div class="col-3">
+                          Round 1
+                          <input type="time" class="form-control" placeholder="Round 1" formControlName="round_1">
+                        </div>
+                        <div class="col-3">
+                          Round 2
+                          <input type="time" class="form-control" placeholder="Round 2" formControlName="round_2">
+                        </div>
+                        <div class="col-3">
+                          Finals
+                          <input type="time" class="form-control" placeholder="Finals" formControlName="finals">
+                        </div>
+						<input type="hidden" formControlName="__v" />
+                      </div>
+                    </div>
+                    <hr>
+                    <div class="form-group">
+                      <h4 class="card-title">Count Details</h4>
+                      <div class="row">
+                        <div class="col-4" *ngIf="event">
+                          Minimum Members
+                          <input type="number" class="form-control" placeholder="Minimum Members" formControlName="min_members">
+                        </div>
+                        <div class="col-4" *ngIf="event">
+                          Maximum Members
+                          <input type="number" class="form-control" placeholder="Maximum Members" formControlName="max_members">
+                        </div>
+                        <div class="col-4">
+                          Maximum Limit
+                          <input type="number" class="form-control" placeholder="Maximum Limit" formControlName="max_limit">
+                        </div>
+                      </div>
+                    </div>
+                    <hr>
+                    <div class="form-group">
+                      <div class="row">
+                        <div class="col-6">
+                          Contact Email Address
+                          <input type="email" class="form-control" placeholder="Contact mail Address" formControlName="contact_email">
+                        </div>
+                        <div class="col-6">
+                          <br />
+                          <span class="btn left" [ngClass]="{'btn-danger' : allow_gender_mixing , 'btn-success' : !allow_gender_mixing }">
+                            <span (click)="changeGenderMixing()" *ngIf="allow_gender_mixing">
+                              Disable Gender Mixing
+                            </span>
+                            <span (click)="changeGenderMixing()" *ngIf="!allow_gender_mixing">
+                              Enable Gender Mixing
+                            </span>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <div class="row">
+                        <div class="col-6">
+                          Venue
+                          <input type="text" class="form-control" placeholder="Venue" formControlName="venue">
+                        </div>
+                        <div class="col-6">
+                          Amount
+                          <input type="number" class="form-control" placeholder="Amount" formControlName="amount">
+                        </div>
+                      </div>
+                    </div>
+                    <hr />
+                    <div class="form-group">
+                      <div class="row">
+                        <div class="form-action left row">
+                          <div class="col-6">
+                            <span (click)="createForm()" class="btn btn-outline-danger left">Reset</span>
+                          </div>
+                          <div class="col-6">
+                            <button type="submit" class="btn btn-outline-success right">{{this.Button}}</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <h4 class="card-title">Events</h4>
+              <a class="heading-elements-toggle"><i class="la la-ellipsis-v font-medium-3"></i></a>
+              <div class="heading-elements">
+                <ul class="list-inline mb-0">
+                  <li><a data-action="collapse"><i class="ft-minus"></i></a></li>
+                  <li><a data-action="reload" (click)="reloadEvents()"><i class="ft-rotate-cw"></i></a></li>
+                  <li><a data-action="expand"><i class="ft-maximize"></i></a></li>
+                </ul>
+              </div>
+            </div>
+            <div class="card-content collapse show">
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-6">
+                    <input [(ngModel)]="searchText" placeholder="Search Events" class="form-control" />
+                  </div>
+                  <div class="col-2">
+                    <span class="fonticon-wrap success">
+                      <a (click)="loadFull()">
+                        <i class="la la-search la-2x"></i>
+                      </a>
+                    </span>
+                  </div>
+                  <div class="col-4 ">
+                    <div class="right">
+                      <span *ngIf="this.currentPage != 1">
+                        <span class="btn btn-info" (click)="previousPage()"> &lt; </span>
+                      </span>
+                      &nbsp; Page {{currentPage}} &nbsp;
+                      <span class="btn btn-info" (click)="nextPage()"> &gt; </span>
+                    </div>
+                  </div>
+                </div>
+                <br />
+                <div class="table-responsive">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>Sl. No</th>
+                        <th>Event Name</th>
+                        <th>Event Category</th>
+                        <th>Update</th>
+                        <th>Upload Image</th>
+                        <th>Delete</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let event of events | searchfilter : searchText ; let i = index;   ">
+                        <th scope="row">{{i+1}}</th>
+                        <td>{{event.title}}</td>
+                        <td>{{event.category_id.name}}</td>
+                        <td>
+                          <div class="fonticon-wrap icon-shadow icon-shadow-warning">
+                            <a (click)="updateEvent(event._id,event.category_id.name)"> <i class="la la-pencil la-2x"></i></a>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="fonticon-wrap icon-shadow icon-shadow-primary" (click)="selectEvent(event._id)"
+                            data-toggle="modal" data-target="#uploadModal">
+                            <a> <i class="la la-upload la-2x"></i></a>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="fonticon-wrap icon-shadow icon-shadow-danger" (click)="deleteEvent(event._id)">
+                            <a> <i class="la la-trash la-2x"></i></a>
+                          </div>
+                        </td>
+
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

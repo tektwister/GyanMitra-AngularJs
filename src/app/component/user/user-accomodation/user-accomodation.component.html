@@ -1,0 +1,205 @@
+<div class="app-content content">
+  <div class="content-wrapper">
+    <div class="content-wrapper-before"></div>
+    <div class="content-header row">
+      <div class="content-header-left col-md-4 col-12 mb-2">
+        <h3 class="content-header-title">Accomodation</h3>
+      </div>
+      <div class="content-header-right col-md-8 col-12">
+        <div class="breadcrumbs-top float-md-right">
+          <div class="breadcrumb-wrapper mr-1">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="index.html">Home</a>
+              </li>
+              <li class="breadcrumb-item active"> Accomodation
+              </li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="content-body" *ngIf="accomodationEnabled">
+      <form action="https://secure.payu.in/_payment" id="frm-payment" method="post">
+        <input type="hidden" name="key" value={{appService.getKey()}}>
+        <input type="hidden" name="txnid" value={{txnId}}>
+        <input type="hidden" name="amount" value={{totalAmount+(totalAmount*appService.getTransactionFee())}}>
+        <input type="hidden" name="productinfo" value={{this.appService.getProductInfo()}}>
+        <input type="hidden" name="firstname" value={{user.name}}>
+        <input type="hidden" name="email" value={{user.email_id}}>
+        <input type="hidden" name="phone" value={{user.mobile_number}}>
+        <input type="hidden" name="surl" value="http://www.gyanmitra19.mepcoeng.ac.in/payment/acc/success">
+        <input type="hidden" name="furl" value="http://www.gyanmitra19.mepcoeng.ac.in/payment/acc/failure">
+        <input type="hidden" name="hash" value={{hashString}}>
+
+      </form>
+      <!-- Modal -->
+      <div class="modal fade" id="DDModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Confirm offline Payment - Rs.{{totalAmount}}</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <ol>
+                <li>The Demand draft must be drawn in the favour of Mepco Schlenk Engineering College</li>
+                <li>The Demand draft must be payable at Sivakasi, Tamil Nadu</li>
+                <li>You are required to pay <b>Rs. {{totalAmount}}</b></li>
+                <li>At the back side of your <b></b>, write your <b>GM ID</b> followed by 'Accomodation' and the number
+                  of
+                  days with pencil</li>
+                <li>
+                  Demand draft must reach us on or before <b>05-Feb-2019</b> via any means to the address : <br />
+                  The Convenor,<br />
+                  GyanMitra 19,<br />
+                  Mepco Schlenk Engineering College,<br />
+                  Virudhunagar District,<br />
+                  Tamil Nadu - 626 006<br />
+                </li>
+              </ol>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-success" (click)="confirmDD()">Confirm Payment</button>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal fade" id="PayOnline" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Cart Amount - Rs.
+                {{totalAmount+(totalAmount*appService.getTransactionFee())}}</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              DO You Really Want Pay Online?
+            </div>
+            <div class="modal-footer">
+              <button type="submit" onclick="$('#frm-payment').submit()" class="btn btn-secondary">PAY</button>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <section id="content-types">
+        <div class="row match-height justify-content-md-center">
+          <div class="col-xl-6 col-md-12">
+          </div>
+        </div>
+      </section>
+      <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <h4 class="card-title">
+                <span *ngIf="accomodation" [ngClass]="{'success': accomodation.acc_payment_status == 'Paid' && accomodation.acc_status == 'Confirmed'}"
+                  [ngClass]="{'danger': accomodation.acc_payment_status == 'Not Paid' && accomodation.acc_status == 'Not Confirmed'}">
+                  Payment Status : {{accomodation.acc_payment_status}} | Accomodation Status :
+                  {{accomodation.acc_status}}
+                </span>
+                <span *ngIf="!accomodation">
+                  Accomodation Status : Not Applied
+                </span>
+              </h4>
+              <a class="heading-elements-toggle"><i class="la la-ellipsis-v font-medium-3"></i></a>
+              <div class="heading-elements">
+                <ul class="list-inline mb-0">
+                </ul>
+              </div>
+            </div>
+            <div class="card-content collapse show">
+              <div class="card-body">
+                <div *ngIf="!accomodation">
+                  <form class="form" [formGroup]="accomodationForm" (ngSubmit)=onSubmit(accomodationForm.value)>
+                    <div class="form-group">
+                      <div class="row">
+                        <div class="col-5">
+                          Number of Days:
+                          <select class="custom-select" placeholder="Number of Days" formControlName="acc_days">
+                            <option value="0" selected disabled>Number of Days</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                          </select>
+
+                        </div>
+                        <div class="col-2">
+                          <button type="reset" class="btn btn-outline-success right">Reset</button>
+                        </div>
+                        <div class="col-2">
+                          <button type="submit" class="btn btn-outline-success right">Apply</button>
+                        </div>
+                      </div>
+
+                    </div>
+                  </form>
+                </div>
+                <div>
+                  <div *ngIf="hasAccomodation && accomodation.acc_status=='Approved' && accomodation.acc_payment_status=='Not Paid'">
+                    <div class="container">
+                      <h2>Payment</h2>
+                      <hr />
+                      <div class="form-group">
+                        <div class="row btn-group">
+                            <button class="btn btn-info border-white border-2  float-right" data-toggle="modal"
+                            data-target="#PayOnline" (click)="payOnline()">Pay Online</button>
+                          <button class="btn btn-secondary border-white border-2  float-right" data-toggle="modal"
+                            data-target="#DDModal">Pay Through DD</button>
+                          
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="collapse" id="DDUpload">
+                          <div class="card card-body">
+                            <form>
+                              <input #imageInput placeholder="Select an Image" type="file" accept="image/*" (change)="processFile($event)">
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="danger" *ngIf="hasAccomodation && accomodation.acc_status=='Not Confirmed' && accomodation.acc_payment_status=='Not Paid'">
+                    <div class="container">
+                      <h2>
+                        Wait till your accomodation is opened up for payment
+                      </h2>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="content-body" *ngIf="!accomodationEnabled">
+      <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <h4 class="card-title">
+              </h4>
+              <a class="heading-elements-toggle"><i class="la la-ellipsis-v font-medium-3"></i></a>
+              <div class="heading-elements">
+                <ul class="list-inline mb-0">
+                </ul>
+              </div>
+            </div>
+            <div class="card-content collapse show">
+              <div class="card-body">
+                <h3>Accomodation Requests are Closed</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
